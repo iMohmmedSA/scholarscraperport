@@ -6,14 +6,6 @@
     pkgs.python311Packages.pip
     pkgs.jupyter
     pkgs.R
-    
-    # R Packages
-    pkgs.rPackages.tidyverse
-    pkgs.rPackages.MASS
-    pkgs.rPackages.Matrix
-    pkgs.rPackages.farver
-    pkgs.rPackages.mgcv
-    pkgs.rPackages.scales
 
     # Build R
     pkgs.gcc
@@ -37,11 +29,18 @@
 
   env = {
     PKG_CONFIG_PATH = "${pkgs.libxml2.dev}/lib/pkgconfig:${pkgs.freetype.dev}/lib/pkgconfig:${pkgs.harfbuzz.dev}/lib/pkgconfig:${pkgs.fribidi.dev}/lib/pkgconfig:${pkgs.fontconfig.dev}/lib/pkgconfig:${pkgs.libpng.dev}/lib/pkgconfig:${pkgs.libtiff.dev}/lib/pkgconfig:${pkgs.libjpeg.dev}/lib/pkgconfig";
+    R_LIBS_USER = "/home/user/R/x86_64-pc-linux-gnu-library/4.4";
   };
   idx = {
     extensions = [
       "ms-toolsai.jupyter"
       "ms-python.python"
+      "ms-python.debugpy"
+      "ms-toolsai.jupyter-keymap"
+      "ms-toolsai.jupyter-renderers"
+      "ms-toolsai.vscode-jupyter-cell-tags"
+      "ms-toolsai.vscode-jupyter-slideshow"
+      "REditorSupport.r"
     ];
 
     workspace = {
@@ -52,33 +51,40 @@
           source .venv/bin/activate
           pip install -r requirements.txt
 
-          rm -rf /home/user/R/x86_64-pc-linux-gnu-library/4.3/00LOCK-*
+          mkdir -p /home/user/R/x86_64-pc-linux-gnu-library/4.4
+          rm -rf /home/user/R/x86_64-pc-linux-gnu-library/4.4/00LOCK-*
 
-          R --no-save --no-restore -e "
+          R --silent --slave --no-save --no-restore -e "
+            .libPaths('/home/user/R/x86_64-pc-linux-gnu-library/4.4')
+            install.packages('languageserver', repos='https://cran.r-project.org/')
+          "
+
+          R --silent --slave --no-save --no-restore -e "
+            .libPaths('/home/user/R/x86_64-pc-linux-gnu-library/4.4')
             install.packages('MASS', dependencies = TRUE, repos='https://cran.r-project.org/')
           "
-          R --no-save --no-restore -e "
-            install.packages('ggplot2', dependencies = TRUE, repos='https://cran.r-project.org/')
-          "
 
-          R --no-save --no-restore -e "
+          R --silent --slave --no-save --no-restore -e "
+            .libPaths('/home/user/R/x86_64-pc-linux-gnu-library/4.4')
             install.packages('tidyverse', dependencies = TRUE, repos='https://cran.r-project.org/')
           "
 
-          R --no-save --no-restore -e "
+          R --silent --slave --no-save --no-restore -e "
+            .libPaths('/home/user/R/x86_64-pc-linux-gnu-library/4.4')
             install.packages('juicyjuice', repos='https://cran.r-project.org/')
           "
 
-          R --no-save --no-restore -e "
+          R --silent --slave --no-save --no-restore -e "
+            .libPaths('/home/user/R/x86_64-pc-linux-gnu-library/4.4')
             install.packages('patchwork', dependencies = TRUE, repos='https://cran.r-project.org/')
           "
 
           # Install required R packages
-          R --no-save --no-restore -e "
+          R --silent --slave --no-save --no-restore -e "
+            .libPaths('/home/user/R/x86_64-pc-linux-gnu-library/4.4')
           required_packages <- c(
-            'IRkernel', 'languageserver', 'devtools', 'tidyverse', 
-            'Matrix', 'farver', 'mgcv', 'scales', 
-            'viridis', 'patchwork', 'circlize', 'RColorBrewer'
+            'IRkernel', 'devtools', 
+            'viridis', 'circlize', 'RColorBrewer'
           )
 
           installed_packages <- rownames(installed.packages())
@@ -100,3 +106,6 @@
     previews = {};
   };
 }
+
+
+# /nix/store/v2ngdlg7hy5bmk9las1w9hfd4dnhshhb-init
