@@ -1,0 +1,5 @@
+scholarly
+pandas
+matplotlib
+notebook
+tqdm
